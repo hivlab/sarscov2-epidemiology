@@ -1,11 +1,11 @@
 rule all:
     input:
-        auspice_json = "auspice/zika.json",
+        auspice_json = "auspice/sarscov2.json",
 
 input_fasta = "data/sequences.fasta",
 input_metadata = "data/metadata.tsv",
 dropped_strains = "config/dropped_strains.txt",
-reference = "config/zika_outgroup.gb",
+reference = "config/sarscov2_outgroup.gb",
 colors = "config/colors.tsv",
 lat_longs = "config/lat_longs.tsv",
 auspice_config = "config/auspice_config.json"
@@ -27,7 +27,7 @@ rule filter:
     params:
         group_by = "country year month",
         sequences_per_group = 20,
-        min_date = 2012
+        min_date = 2019
     shell:
         """
         augur filter \
