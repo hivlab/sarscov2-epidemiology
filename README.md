@@ -1,5 +1,4 @@
-# Nextstrain build for Zika virus tutorial
+# Nextstrain build for Sars-Cov-2
 
-This repository provides the data and scripts associated with the [Zika virus tutorial](https://nextstrain.org/docs/getting-started/zika-tutorial).
+This repository provides the data and scripts for Sars-CoV-2 Nextstrain build.
 
-See the [original Zika build repository](https://github.com/nextstrain/zika) for more about the public build.

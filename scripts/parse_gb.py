@@ -26,7 +26,7 @@ with open("data/sequences.fasta", "w") as fasta_handle:
         if len(seq_record.seq) > 28000:
             q = seq_record.features[0]
             refs = seq_record.annotations["references"][0]
-            ids = {"accession": seq_record.id, "description": seq_record.description, "length": len(seq_record.seq)}
+            ids = {"accession": re.sub("\.\d$", "", seq_record.id), "description": seq_record.description, "length": len(seq_record.seq)}
             qualifiers = {k: v[0] for k, v in q.qualifiers.items()}
             if "strain" not in qualifiers:
                 qualifiers.update({"strain": None})

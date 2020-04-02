@@ -1,9 +1,9 @@
 {
-  "title": "Tutorial Nextstrain build for Zika virus",
+  "title": "Nextstrain build for Sars-CoV-2 virus",
   "maintainers": [
-    {"name": "Trevor Bedford", "url": "http://bedford.io/team/trevor-bedford/"}
+    {"name": "Taavi Päll", "url": "https://www.biomeditsiin.ut.ee/en/institute/department-microbiology"}
   ],
-  "build_url": "https://github.com/nextstrain/zika-tutorial",
+  "build_url": "https://github.com/avilab/sars-cov2-est",
   "colorings": [
     {
       "key": "gt",
