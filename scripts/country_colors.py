@@ -3,6 +3,7 @@ from colour import Color
 import pandas as pd
 from geopy.geocoders import Nominatim
 
+
 metadata = pd.read_csv("data/metadata.tsv", sep = "\t")
 countries = list(set(metadata["country"]))
 countires = countries.sort()
