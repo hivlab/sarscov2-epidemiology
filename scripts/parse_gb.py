@@ -25,6 +25,7 @@ with open("data/sequences.fasta", "w") as fasta_handle:
     for seq_record in SeqIO.parse("data/sequences.gb", "genbank"):
         if len(seq_record.seq) > 28000:
             q = seq_record.features[0]
+            refs = seq_record.annotations["references"][0]
             ids = {"accession": seq_record.id, "description": seq_record.description, "length": len(seq_record.seq)}
             qualifiers = {k: v[0] for k, v in q.qualifiers.items()}
             if "strain" not in qualifiers:
@@ -43,6 +44,8 @@ with open("data/sequences.fasta", "w") as fasta_handle:
             ids.update(qualifiers)
             # Replace space with backslashes to fix fasta headers
             ids["strain"] = ids["strain"].replace(" ", "/")
+            # Add references
+            ids.update({"author": refs.authors, "journal": refs.journal, "title": refs.title})
             ord_list.append(ids)
             fasta_handle.write(
                 ">{}\n{}\n".format(ids["strain"], seq_record.seq)
