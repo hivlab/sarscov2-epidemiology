@@ -21,7 +21,7 @@
   "homepage": "https://github.com/avilab/sars-cov2-est#readme",
   "engines": {
     "node": "10.13.3",
-    "npm": "6.2.x"
+    "npm": "6.4.1"
   },
   "dependencies": {
     "auspice": "^2.11.3"
