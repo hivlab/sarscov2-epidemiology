@@ -24,16 +24,10 @@
       "key": "country",
       "title": "Country",
       "type": "categorical"
-    },
-    {
-      "key": "region",
-      "title": "Region",
-      "type": "categorical"
     }
   ],
   "geo_resolutions": [
-    "country",
-    "region"
+    "country"
   ],
   "panels": [
      "tree",
@@ -44,7 +38,6 @@
   },
   "filters": [
     "country",
-    "region",
     "author"
   ]
 }
