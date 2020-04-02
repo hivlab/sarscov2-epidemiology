@@ -37,12 +37,21 @@ with open("data/sequences.fasta", "w") as fasta_handle:
             )
 
 
-df = pd.DataFrame(ord_list, columns=ord_list[0].keys())
+# Parsing metadata
+df = pd.DataFrame(ord_list, columns=ord_list[0].keys()).set_index("strain", drop=False)
 df_renamed = df.rename(
     columns={"organism": "virus", "collection_date": "date"}
 )
 df_renamed["date"] = df_renamed["date"].apply(lambda x: fix_date(x))
-new = df_renamed["country"].str.split(": ", expand = True)
+new = df_renamed["country"].str.split(": ?", expand = True)
 df_renamed["division"] = new[1]
 df_renamed["country"] = new[0]
+
+
+# Fix missing country
+jp = ["SARS-CoV-2/Hu/DP/Kng/19-027", "SARS-CoV-2/Hu/DP/Kng/19-020"]
+df_renamed.loc[jp, "country"] = "Japan"
+
+
+# Writing metadata to file
 df_renamed.to_csv("data/metadata.tsv", sep="\t", index=False)
