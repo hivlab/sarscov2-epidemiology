@@ -1,0 +1,29 @@
+{
+  "name": "sars-cov2-est",
+  "version": "1.0.0",
+  "description": "This repository provides the data and scripts for Sars-CoV-2 Nextstrain build.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "view": "auspice view --datasetDir auspice",
+    "start": "npm run view"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avilab/sars-cov2-est.git"
+  },
+  "keywords": ["sars-cov-2"],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/avilab/sars-cov2-est/issues"
+  },
+  "homepage": "https://github.com/avilab/sars-cov2-est#readme",
+  "engines": {
+    "node": "10.8.x",
+    "npm": "6.2.x"
+  },
+  "dependencies": {
+    "auspice": "^2.11.3"
+  }
+}
