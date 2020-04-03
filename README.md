@@ -34,15 +34,13 @@ conda install -c conda-forge nodejs=10
 npm install --global auspice
 ```
 
-
 > Now you should have software environment ready.
-
 
 - Next, you need data, to get this dataset, (fork and) clone this repository to your computer.
 
-For example, let's clone this repo to `Downloads` folder in your home directory, and then enter this cloned folder. 
+For example, let's clone this repo to `Downloads` folder in your home directory, and then enter this cloned folder.
 
-For the next step you need to be inside sars-cov2-est folder.
+For the next step (Running) you need to be inside sars-cov2-est folder.
 
 ```bash
 cd Downloads
