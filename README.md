@@ -1,6 +1,6 @@
 # Nextstrain build for Sars-Cov-2
 
-This repository provides the data and scripts for Sars-CoV-2 Nextstrain build.
+This repository provides the data and scripts for Sars-CoV-2 Nextstrain build and **visualisation**.
 
 ## Install
 
@@ -66,4 +66,8 @@ auspice view --datasetDir auspice
 
 Now, if everything goes as expected, you should see instructions in your terminal that direct you to web browser where you find Sars-CoV-2 dataset and **start exploring**.
 
-Uhh!
+## Build
+
+To rebuild this dataset, in case you append new sequences,
+you need also install Augur and dependencies as described in <https://nextstrain.org/docs/getting-started/local-installation#install-augur--auspice-with-conda-recommended>.
+
