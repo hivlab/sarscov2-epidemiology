@@ -39,5 +39,8 @@ Icon?
 ehthumbs.db
 Thumbs.db
 .vscode
-node_modules/
+
 *.log
+/node_modules
+npm-debug.log
+/*.env
