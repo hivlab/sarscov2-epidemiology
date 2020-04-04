@@ -21,12 +21,10 @@
   },
   "homepage": "https://github.com/avilab/sars-cov2-est#readme",
   "engines": {
-    "node": "6.11.1",
-    "npm": "3.10.10"
+    "node": "8.x"
   },
   "dependencies": {
-    "auspice": "^2.11.3",
-    "util.promisify": "1.0.1"
+    "auspice": "^2.11.3"
   },
   "devDependencies": {}
 }
