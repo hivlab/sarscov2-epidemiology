@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "view": "auspice view --datasetDir auspice",
-    "start": "npm run view"
+    "start": "auspice view --datasetDir auspice"
   },
   "repository": {
     "type": "git",
@@ -22,7 +21,8 @@
   },
   "homepage": "https://github.com/avilab/sars-cov2-est#readme",
   "engines": {
-    "node": "6.11.1"
+    "node": "6.11.1",
+    "npm": "3.10.10"
   },
   "dependencies": {
     "auspice": "^2.11.3"
