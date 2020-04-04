@@ -21,11 +21,10 @@
   },
   "homepage": "https://github.com/avilab/sars-cov2-est#readme",
   "engines": {
-    "node": "6.11.1"
+    "node": "13.12.0"
   },
   "dependencies": {
-    "auspice": "^2.11.3",
-    "bluebird": "3.7.2"
+    "auspice": "^2.11.3"
   },
   "devDependencies": {}
 }
