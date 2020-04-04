@@ -25,7 +25,8 @@
     "npm": "3.10.10"
   },
   "dependencies": {
-    "auspice": "^2.11.3"
+    "auspice": "^2.11.3",
+    "util.promisify": "1.0.1"
   },
   "devDependencies": {}
 }
