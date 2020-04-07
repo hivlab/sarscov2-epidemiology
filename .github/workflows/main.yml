@@ -21,3 +21,10 @@ jobs:
             conda activate nextstrain
             npm install --global auspice
             snakemake -F -j
+        - name: Commit dataset
+          run: |
+            git config --local user.email "action@github.com"
+            git config --local user.name "GitHub Action"
+            git add data/sequences.gb config/colors.tsv config/lat_longs.tsv auspice/sarscov2.json
+            git commit -m 'Updated dataset' || echo "No changes to commit"
+            git push https://${{github.actor}}:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git HEAD:${{ github.ref }} || echo "No changes to commit"
