@@ -21,8 +21,8 @@ gen = ", complete genome"
 
 ord_list = []
 strain = []
-with open("data/sequences.fasta", "w") as fasta_handle:
-    for seq_record in SeqIO.parse("data/sequences.gb", "genbank"):
+with open(snakemake.output.fasta, "w") as fasta_handle:
+    for seq_record in SeqIO.parse(snakemake.input[0], "genbank"):
         if len(seq_record.seq) > 28000:
             q = seq_record.features[0]
             refs = seq_record.annotations["references"][0]
@@ -69,4 +69,4 @@ df_renamed.loc[jp, "country"] = "Japan"
 
 
 # Writing metadata to file
-df_renamed.to_csv("data/metadata.tsv", sep="\t", index=False)
+df_renamed.to_csv(snakemake.output.metadata, sep="\t", index=False)

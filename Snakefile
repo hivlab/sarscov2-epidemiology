@@ -1,14 +1,42 @@
+import os
+
 rule all:
     input:
         auspice_json = "auspice/sarscov2.json",
 
-input_fasta = "data/sequences.fasta",
-input_metadata = "data/metadata.tsv",
+
 dropped_strains = "config/dropped_strains.txt",
 reference = "config/sarscov2_outgroup.gb",
-colors = "config/colors.tsv",
-lat_longs = "config/lat_longs.tsv",
 auspice_config = "config/auspice_config.json"
+
+rule getdata:
+    output:
+        "data/sequences.gb"
+    params:
+        email = "taavi.pall@ut.ee",
+        api_key = os.environ.get("NCBI_APIKEY")
+    script:
+        "scripts/get_data.py"
+
+rule parsegb:
+    input:
+        "data/sequences.gb"
+    output:
+        fasta = "data/sequences.fasta",
+        metadata = "data/metadata.tsv"
+    script:
+        "scripts/parse_gb.py"
+    
+
+rule colors:
+    input:
+        rules.parsegb.output.metadata
+    output:
+        col = "config/colors.tsv",
+        loc = "config/lat_longs.tsv"
+    script:
+        "scripts/country_colors.py" 
+
 
 rule filter:
     message:
@@ -19,8 +47,8 @@ rule filter:
           - excluding strains in {input.exclude}
         """
     input:
-        sequences = input_fasta,
-        metadata = input_metadata,
+        sequences = rules.parsegb.output.fasta,
+        metadata = rules.parsegb.output.metadata,
         exclude = dropped_strains
     output:
         sequences = "results/filtered.fasta"
@@ -85,7 +113,7 @@ rule refine:
     input:
         tree = rules.tree.output.tree,
         alignment = rules.align.output,
-        metadata = input_metadata
+        metadata = rules.parsegb.output.metadata
     output:
         tree = "results/tree.nwk",
         node_data = "results/branch_lengths.json"
@@ -147,7 +175,7 @@ rule traits:
     message: "Inferring ancestral traits for {params.columns!s}"
     input:
         tree = rules.refine.output.tree,
-        metadata = input_metadata
+        metadata = rules.parsegb.output.metadata
     output:
         node_data = "results/traits.json",
     params:
@@ -166,13 +194,13 @@ rule export:
     message: "Exporting data files for for auspice"
     input:
         tree = rules.refine.output.tree,
-        metadata = input_metadata,
+        metadata = rules.parsegb.output.metadata,
         branch_lengths = rules.refine.output.node_data,
         traits = rules.traits.output.node_data,
         nt_muts = rules.ancestral.output.node_data,
         aa_muts = rules.translate.output.node_data,
-        colors = colors,
-        lat_longs = lat_longs,
+        colors = rules.colors.output.col,
+        lat_longs = rules.colors.output.loc,
         auspice_config = auspice_config
     output:
         auspice_json = rules.all.input.auspice_json,
