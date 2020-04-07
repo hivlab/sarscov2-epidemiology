@@ -17,6 +17,8 @@ jobs:
         - name: Setup Snakemake environment
           run: |
             conda env create -f environment.yml
+            conda init bash
+            source ~/.bashrc
             conda activate nextstrain
             npm install --global auspice
           
