@@ -1,0 +1,25 @@
+name: nextstrain
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - cvxopt
+  - fasttree
+  - iqtree
+  - mafft
+  - opencv
+  - pandas
+  - python=3
+  - nodejs=10
+  - raxml
+  - vcftools
+  - git
+  - pip
+  - seaborn
+  - colour
+  - biopython
+  - geopy
+  - pip:
+    - nextstrain-augur
+    - nextstrain-cli

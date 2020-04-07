@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches_ignore: []
+
+
+testing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      
+      - name: Setup Snakemake environment
+        run: |
+          conda env create -f environment.yml
+          conda activate nextstrain
+          npm install --global auspice
+        
+      - name: Run workflow
+        run: |
+          snakemake -F -j
+      
+      

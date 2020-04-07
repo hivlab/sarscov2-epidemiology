@@ -4,9 +4,6 @@ results/
 build/
 dist/
 
-# Sensitive environment variables
-environment*
-
 # Snakemake state dir
 /.snakemake
 
