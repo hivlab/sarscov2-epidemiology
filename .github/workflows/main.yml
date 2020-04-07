@@ -14,15 +14,10 @@ jobs:
       steps:
         - uses: actions/checkout@v1
         
-        - name: Setup Snakemake environment
+        - name: Setup Snakemake environment and run workflow
           run: |
             eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
             conda env create -f environment.yml
             conda activate nextstrain
             npm install --global auspice
-          
-        - name: Run workflow
-          run: |
             snakemake -F -j
-      
-      
