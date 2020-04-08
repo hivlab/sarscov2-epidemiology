@@ -20,6 +20,8 @@ dependencies:
   - colour
   - biopython
   - geopy
+  - xlrd
   - pip:
     - nextstrain-augur
     - nextstrain-cli
+    - gdown
