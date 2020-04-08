@@ -4,7 +4,7 @@ import pandas as pd
 from Bio import SeqIO
 import io
 
-# Download GISAID cov2020 acknowledgements file from Google drive 
+# Download GISAID cov2020 acknowledgements file from Google drive
 excel_url = "https://drive.google.com/uc?id=1g85nEcuiVnmO75Hh8yWAty5uW8P_RSiR"
 
 # Download sars-cov-2 genomic sequences fasta file
@@ -22,10 +22,13 @@ for i in country:
     ids.append(df[df["virus_name"].str.contains(i)])
 
 df_country = pd.concat(ids)
-df_country = df_country[df_country["submitting_lab"] != "Charité Universitätsmedizin Berlin, Institute of Virology"]
+df_country = df_country[
+    df_country["submitting_lab"]
+    != "Charité Universitätsmedizin Berlin, Institute of Virology"
+]
 
 with open("data/metadata_gisaid.tsv", "w") as oh:
-    df_country.to_csv(oh, sep = "\t")
+    df_country.to_csv(oh, sep="\t")
 
 ids_list = df_country.index.tolist()
 with tempfile.TemporaryFile() as tmp:
