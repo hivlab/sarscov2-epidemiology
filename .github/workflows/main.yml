@@ -4,9 +4,8 @@ on:
   push:
     branches:
       - master
-      - actions
-  pull_request:
-    branches_ignore: []
+  schedule:
+    - cron:  "15 9,13,17,21 * * *"
 
 jobs:
   data:
