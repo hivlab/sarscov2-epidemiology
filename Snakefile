@@ -190,6 +190,25 @@ rule traits:
             --confidence
         """
 
+
+rule clades:
+    message: "Labeling clades as specified in config/clades.tsv"
+    input:
+        tree = rules.refine.output.tree,
+        aa_muts = rules.translate.output.node_data,
+        nuc_muts = rules.ancestral.output.node_data,
+        clades = "config/clades.tsv"
+    output:
+        clade_data = "results/clades.json"
+    shell:
+        """
+        augur clades --tree {input.tree} \
+            --mutations {input.nuc_muts} {input.aa_muts} \
+            --clades {input.clades} \
+            --output {output.clade_data}
+        """
+
+
 rule export:
     message: "Exporting data files for for auspice"
     input:
@@ -201,6 +220,7 @@ rule export:
         aa_muts = rules.translate.output.node_data,
         colors = rules.colors.output.col,
         lat_longs = rules.colors.output.loc,
+        clades = rules.clades.output.clade_data,
         auspice_config = auspice_config
     output:
         auspice_json = rules.all.input.auspice_json,
@@ -209,7 +229,7 @@ rule export:
         augur export v2 \
             --tree {input.tree} \
             --metadata {input.metadata} \
-            --node-data {input.branch_lengths} {input.traits} {input.nt_muts} {input.aa_muts} \
+            --node-data {input.branch_lengths} {input.traits} {input.nt_muts} {input.aa_muts} {input.clades} \
             --colors {input.colors} \
             --lat-longs {input.lat_longs} \
             --auspice-config {input.auspice_config} \
