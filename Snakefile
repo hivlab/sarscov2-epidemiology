@@ -210,7 +210,7 @@ rule clades:
 
 
 rule export:
-    message: "Exporting data files for for auspice"
+    message: "Exporting data files for auspice"
     input:
         tree = rules.refine.output.tree,
         metadata = rules.parsegb.output.metadata,
