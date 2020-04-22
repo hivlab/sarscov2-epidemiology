@@ -6,7 +6,8 @@ from geopy.geocoders import Nominatim
 
 metadata = pd.read_csv(snakemake.input[0], sep="\t")
 countries = list(set(metadata["country"]))
-countires = countries.sort()
+print(countries)
+# countires = countries.sort()
 countries = [i.lower() for i in countries]
 n = len(countries)
 
