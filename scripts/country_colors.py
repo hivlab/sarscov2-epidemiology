@@ -7,12 +7,9 @@ from geopy.geocoders import Nominatim
 metadata = pd.read_csv(snakemake.input[0], sep="\t")
 metadata_na = metadata.fillna(value = {"country": "unknown"})
 countries = list(set(metadata_na["country"]))
-print(countries)
-countires = countries.sort()
+countries.sort()
 countries = [i.lower() for i in countries]
-countries_sorted = countries.append(countries.pop(countries.index("unknown")))
-print(countries_sorted)
-n = len(countries_sorted)
+n = len(countries)
 
 # Setup color palette
 rgb_pal = sns.hls_palette(n, l=0.4)
