@@ -5,8 +5,9 @@ from geopy.geocoders import Nominatim
 
 
 metadata = pd.read_csv(snakemake.input[0], sep="\t")
-metadata = metadata.fillna(value = {"country": "unknown"})
-countries = list(set(metadata["country"]))
+metadata_na = metadata.fillna(value = {"country": "unknown"})
+countries = list(set(metadata_na["country"]))
+print(countries)
 countires = countries.sort()
 countries = [i.lower() for i in countries]
 countries = countries.append(countries.pop(countries.index("unknown")))
