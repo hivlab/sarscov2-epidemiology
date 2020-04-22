@@ -117,7 +117,7 @@ rule tree:
         """
         augur tree \
             --alignment {input.alignment} \
-            --output {output.tree}
+            --output {output.tree} \
             --nthreads {threads}
         """
 
