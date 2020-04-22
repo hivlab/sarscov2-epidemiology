@@ -10,8 +10,9 @@ countries = list(set(metadata_na["country"]))
 print(countries)
 countires = countries.sort()
 countries = [i.lower() for i in countries]
-countries = countries.append(countries.pop(countries.index("unknown")))
-n = len(countries)
+countries_sorted = countries.append(countries.pop(countries.index("unknown")))
+print(countries_sorted)
+n = len(countries_sorted)
 
 # Setup color palette
 rgb_pal = sns.hls_palette(n, l=0.4)
