@@ -9,7 +9,7 @@ metadata = metadata.fillna(value = {"country": "unknown"})
 countries = list(set(metadata["country"]))
 countires = countries.sort()
 countries = [i.lower() for i in countries]
-countries = countries.append(countries.pop(countries.index("Unknown")))
+countries = countries.append(countries.pop(countries.index("unknown")))
 n = len(countries)
 
 # Setup color palette
