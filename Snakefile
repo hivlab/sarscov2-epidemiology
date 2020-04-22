@@ -2,7 +2,7 @@ import os
 
 rule all:
     input:
-        auspice_json = "auspice/sarscov2.json",
+        auspice_json = "auspice/sarscov2.json"
 
 
 dropped_strains = "config/dropped_strains.txt",
@@ -79,12 +79,15 @@ rule align:
         reference = reference
     output:
         alignment = "results/aligned.fasta"
+    threads: 4
     shell:
         """
         augur align \
             --sequences {input.sequences} \
             --reference-sequence {input.reference} \
             --output {output.alignment} \
+            --nthreads {threads} \
+            --remove-reference \
             --fill-gaps
         """
 
@@ -94,11 +97,13 @@ rule tree:
         alignment = rules.align.output.alignment
     output:
         tree = "results/tree_raw.nwk"
+    threads: 4
     shell:
         """
         augur tree \
             --alignment {input.alignment} \
             --output {output.tree}
+            --nthreads {threads}
         """
 
 rule refine:
@@ -118,8 +123,12 @@ rule refine:
         tree = "results/tree.nwk",
         node_data = "results/branch_lengths.json"
     params:
-        coalescent = "opt",
+        root = "Wuhan-Hu-1/2019 Wuhan/WH01/2019",
+        clock_rate = 0.0008,
+        clock_std_dev = 0.0004,
+        coalescent = "skyline",
         date_inference = "marginal",
+        divergence_unit = "mutations",
         clock_filter_iqd = 4
     shell:
         """
@@ -129,10 +138,15 @@ rule refine:
             --metadata {input.metadata} \
             --output-tree {output.tree} \
             --output-node-data {output.node_data} \
+            --root {params.root} \
             --timetree \
+            --clock-rate {params.clock_rate} \
+            --clock-std-dev {params.clock_std_dev} \
             --coalescent {params.coalescent} \
-            --date-confidence \
             --date-inference {params.date_inference} \
+            --divergence-unit {params.divergence_unit} \
+            --date-confidence \
+            --no-covariance \
             --clock-filter-iqd {params.clock_filter_iqd}
         """
 
@@ -151,8 +165,27 @@ rule ancestral:
             --tree {input.tree} \
             --alignment {input.alignment} \
             --output-node-data {output.node_data} \
-            --inference {params.inference}
+            --inference {params.inference} \
+            --infer-ambiguous
         """
+
+
+rule haplotype_status:
+    message: "Annotating haplotype status relative to {params.reference_node_name}"
+    input:
+        nt_muts = rules.ancestral.output.node_data
+    output:
+        node_data = "results/haplotype_status.json"
+    params:
+        reference_node_name = "USA/WA1/2020"
+    shell:
+        """
+        python3 scripts/annotate-haplotype-status.py \
+            --ancestral-sequences {input.nt_muts} \
+            --reference-node-name {params.reference_node_name:q} \
+            --output {output.node_data}
+        """
+
 
 rule translate:
     message: "Translating amino acid sequences"
@@ -209,6 +242,20 @@ rule clades:
         """
 
 
+rule recency:
+    message: "Use metadata on submission date to construct submission recency field"
+    input:
+        metadata = "datra/metadata.tsv"
+    output:
+        "results/recency.json"
+    shell:
+        """
+        python3 scripts/construct-recency-from-submission-date.py \
+            --metadata {input.metadata} \
+            --output {output}
+        """
+
+
 rule export:
     message: "Exporting data files for auspice"
     input:
@@ -221,7 +268,8 @@ rule export:
         colors = rules.colors.output.col,
         lat_longs = rules.colors.output.loc,
         clades = rules.clades.output.clade_data,
-        auspice_config = auspice_config
+        auspice_config = auspice_config,
+        recency = rules.recency.output
     output:
         auspice_json = rules.all.input.auspice_json,
     shell:
@@ -229,7 +277,7 @@ rule export:
         augur export v2 \
             --tree {input.tree} \
             --metadata {input.metadata} \
-            --node-data {input.branch_lengths} {input.traits} {input.nt_muts} {input.aa_muts} {input.clades} \
+            --node-data {input.branch_lengths} {input.traits} {input.nt_muts} {input.aa_muts} {input.clades} {input.recency} \
             --colors {input.colors} \
             --lat-longs {input.lat_longs} \
             --auspice-config {input.auspice_config} \
