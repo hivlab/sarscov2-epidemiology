@@ -138,7 +138,7 @@ rule refine:
         tree = "results/tree.nwk",
         node_data = "results/branch_lengths.json"
     params:
-        root = "Wuhan-Hu-1/2019 Wuhan/WH01/2019",
+        root = "SARS-CoV-2/human/CHN/Wuhan_IME-WH01/2019",
         clock_rate = 0.0008,
         clock_std_dev = 0.0004,
         coalescent = "skyline",
