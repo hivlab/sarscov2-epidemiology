@@ -10,6 +10,7 @@ dependencies:
   - mafft
   - opencv
   - pandas
+  - numpy
   - python=3
   - nodejs=10
   - raxml

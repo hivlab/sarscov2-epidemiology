@@ -1,14 +1,17 @@
 import seaborn as sns
 from colour import Color
 import pandas as pd
+import numpy as np
 from geopy.geocoders import Nominatim
 
 
 metadata = pd.read_csv(snakemake.input[0], sep="\t")
 countries = list(set(metadata["country"]))
 print(countries)
-# countires = countries.sort()
+countries = ["Unknown" if np.isnan(i) else i for i in countries]
+countires = countries.sort()
 countries = [i.lower() for i in countries]
+countries = countries.append(countries.pop(countries.index("Unknown")))
 n = len(countries)
 
 # Setup color palette
