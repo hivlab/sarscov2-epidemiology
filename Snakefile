@@ -1,4 +1,19 @@
 import os
+from snakemake.logging import logger
+import sys
+from packaging import version
+
+MIN_AUGUR_VERSION = "7.0.2"
+
+try:
+    from augur.__version__ import __version__ as augur_version
+except ModuleNotFoundError:
+    logger.error("ERROR: Could not find augur. Follow installation instructions at https://nextstrain.org/docs/ and try again.")
+    sys.exit(1)
+
+if version.parse(augur_version) < version.parse(MIN_AUGUR_VERSION):
+    logger.error("ERROR: Found version '%s' of augur, but version '%s' or greater is required" % (augur_version, MIN_AUGUR_VERSION))
+    sys.exit(1)
 
 rule all:
     input:
@@ -245,7 +260,7 @@ rule clades:
 rule recency:
     message: "Use metadata on submission date to construct submission recency field"
     input:
-        metadata = "datra/metadata.tsv"
+        metadata = "data/metadata.tsv"
     output:
         "results/recency.json"
     shell:

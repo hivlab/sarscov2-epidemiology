@@ -31,13 +31,19 @@
   ],
   "panels": [
      "tree",
-     "map"
+     "map",
+     "entropy"
   ],
   "display_defaults": {
-    "map_triplicate": true
+    "color_by": "country",
+    "distance_measure": "num_date",
+    "geo_resolution": "country",
+    "map_triplicate": true,
+    "branch_label": "none"
   },
   "filters": [
     "country",
-    "author"
+    "author",
+    "recency"
   ]
 }

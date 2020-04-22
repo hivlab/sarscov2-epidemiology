@@ -22,6 +22,6 @@ dependencies:
   - geopy
   - xlrd
   - pip:
-    - nextstrain-augur
+    - nextstrain-augur>=7.0.2
     - nextstrain-cli
     - gdown
