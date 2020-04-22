@@ -1,13 +1,12 @@
 import seaborn as sns
 from colour import Color
 import pandas as pd
-import math
 from geopy.geocoders import Nominatim
 
 
 metadata = pd.read_csv(snakemake.input[0], sep="\t")
+metadata = metadata.fillna(value = {"country": "unknown"})
 countries = list(set(metadata["country"]))
-countries = ["Unknown" if str(i) == "nan" else i for i in countries]
 countires = countries.sort()
 countries = [i.lower() for i in countries]
 countries = countries.append(countries.pop(countries.index("Unknown")))
