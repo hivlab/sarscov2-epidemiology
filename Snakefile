@@ -23,6 +23,10 @@ rule all:
 dropped_strains = "config/dropped_strains.txt",
 reference = "config/sarscov2_outgroup.gb",
 auspice_config = "config/auspice_config.json"
+local_data = True
+
+def get_local_data(wildcards):
+    return {"local_fasta": "data/consensus_ano.fa", "local_metadata": "data/metadata_ano.tsv"}
 
 rule getdata:
     output:
@@ -41,11 +45,36 @@ rule parsegb:
         metadata = "data/metadata.tsv"
     script:
         "scripts/parse_gb.py"
-    
+
+if local_data:
+    rule merge_metadata:
+        input:
+            unpack(get_local_data),
+            metadata = rules.parsegb.output.metadata
+        output:
+            metadata = "data/metadata_merged.tsv"
+        run:
+            import pandas as pd
+            md = pd.read_csv(input.metadata, sep = "\t")
+            lmd = pd.read_csv(input.local_metadata, sep = "\t")
+            concatenated = pd.concat([md, lmd])
+            concatenated.to_csv(output.metadata, sep = "\t")
+
+
+
+    rule merge_fasta:
+        input:
+            unpack(get_local_data),
+            fasta = rules.parsegb.output.fasta
+        output:
+            fasta = "data/sequences_merged.fasta"
+        shell:
+            "cat {input.fasta} {input.local_fasta} > {output}"
+
 
 rule colors:
     input:
-        rules.parsegb.output.metadata
+        rules.merge_metadata.output.metadata if local_data else rules.parsegb.output.metadata
     output:
         col = "config/colors.tsv",
         loc = "config/lat_longs.tsv"
@@ -62,8 +91,8 @@ rule filter:
           - excluding strains in {input.exclude}
         """
     input:
-        sequences = rules.parsegb.output.fasta,
-        metadata = rules.parsegb.output.metadata,
+        sequences = rules.merge_fasta.output.fasta if local_data else rules.parsegb.output.fasta,
+        metadata = rules.merge_metadata.output.metadata if local_data else rules.parsegb.output.metadata,
         exclude = dropped_strains
     output:
         sequences = "results/filtered.fasta"
@@ -133,7 +162,7 @@ rule refine:
     input:
         tree = rules.tree.output.tree,
         alignment = rules.align.output,
-        metadata = rules.parsegb.output.metadata
+        metadata = rules.merge_metadata.output.metadata if local_data else rules.parsegb.output.metadata
     output:
         tree = "results/tree.nwk",
         node_data = "results/branch_lengths.json"
@@ -223,7 +252,7 @@ rule traits:
     message: "Inferring ancestral traits for {params.columns!s}"
     input:
         tree = rules.refine.output.tree,
-        metadata = rules.parsegb.output.metadata
+        metadata = rules.merge_metadata.output.metadata if local_data else rules.parsegb.output.metadata
     output:
         node_data = "results/traits.json",
     params:
@@ -260,7 +289,7 @@ rule clades:
 rule recency:
     message: "Use metadata on submission date to construct submission recency field"
     input:
-        metadata = "data/metadata.tsv"
+        metadata = rules.merge_metadata.output.metadata if local_data else rules.parsegb.output.metadata
     output:
         "results/recency.json"
     shell:
@@ -275,7 +304,7 @@ rule export:
     message: "Exporting data files for auspice"
     input:
         tree = rules.refine.output.tree,
-        metadata = rules.parsegb.output.metadata,
+        metadata = rules.merge_metadata.output.metadata if local_data else rules.parsegb.output.metadata,
         branch_lengths = rules.refine.output.node_data,
         traits = rules.traits.output.node_data,
         nt_muts = rules.ancestral.output.node_data,
