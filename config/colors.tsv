@@ -1,25 +1,28 @@
 country	australia	#a82c24
-country	brazil	#a84b24
-country	china	#a86b24
-country	colombia	#a88b24
-country	finland	#a6a824
-country	france	#86a824
-country	greece	#66a824
-country	hong kong	#46a824
-country	india	#26a824
-country	iran	#24a841
-country	israel	#24a861
-country	italy	#24a881
-country	japan	#24a8a0
-country	nepal	#2490a8
-country	pakistan	#2471a8
-country	peru	#2451a8
-country	south africa	#2431a8
-country	south korea	#3624a8
-country	spain	#5624a8
-country	sweden	#7624a8
-country	taiwan	#9624a8
-country	turkey	#a8249b
-country	usa	#a8247b
-country	viet nam	#a8245b
-country	unknown	#a8243c
+country	brazil	#a84824
+country	china	#a86424
+country	colombia	#a88124
+country	czech republic	#a89d24
+country	finland	#97a824
+country	france	#7aa824
+country	greece	#5ea824
+country	hong kong	#42a824
+country	india	#25a824
+country	iran	#24a83f
+country	israel	#24a85b
+country	italy	#24a877
+country	japan	#24a894
+country	malaysia	#24a0a8
+country	nepal	#2484a8
+country	pakistan	#2468a8
+country	peru	#244ba8
+country	south africa	#242fa8
+country	south korea	#3524a8
+country	spain	#5224a8
+country	sri lanka	#6e24a8
+country	sweden	#8a24a8
+country	taiwan	#a724a8
+country	turkey	#a8248d
+country	usa	#a82471
+country	viet nam	#a82455
+country	unknown	#a82438
