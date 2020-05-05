@@ -5,7 +5,7 @@ on:
     branches:
       - master
   schedule:
-    - cron:  "15 9,13,17,21 * * *"
+    - cron:  "15 9,21 * * *"
 
 jobs:
   data:
@@ -14,6 +14,9 @@ jobs:
         - uses: actions/checkout@v1
         
         - name: Setup Snakemake environment and run workflow
+          env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           run: |
             eval "$(command conda 'shell.bash' 'hook' 2> /dev/null)"
             conda env create -f environment.yml
@@ -25,6 +28,6 @@ jobs:
           run: |
             git config --local user.email "action@github.com"
             git config --local user.name "GitHub Action"
-            git add data/sequences.gb config/colors.tsv config/lat_longs.tsv auspice/sarscov2.json data/sequences.fasta data/metadata.tsv
+            git add auspice/sarscov2.json
             git commit -m 'Updated dataset' || echo "No changes to commit"
             git push https://${{github.actor}}:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git HEAD:${{ github.ref }} || echo "No changes to commit"

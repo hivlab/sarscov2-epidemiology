@@ -10,6 +10,7 @@ def batch(iterable, n=1):
 
 Entrez.email = snakemake.params["email"]
 Entrez.api_key = snakemake.params["api_key"]
+Entrez.max_tries = 6
 handle = Entrez.esearch(db="nucleotide", retmax=5000, term="SARS-CoV-2", idtype="acc")
 record = Entrez.read(handle)
 handle.close()
