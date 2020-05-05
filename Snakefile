@@ -21,7 +21,8 @@ rule all:
 
 
 dropped_strains = "config/dropped_strains.txt",
-reference = "config/sarscov2_outgroup.gb",
+reference = "config/sarscov2_outgroup.fa",
+reference_gb = "config/sarscov2_outgroup.gb",
 auspice_config = "config/auspice_config.json"
 local_data = True
 
@@ -61,7 +62,6 @@ if local_data:
             concatenated.to_csv(output.metadata, sep = "\t")
 
 
-
     rule merge_fasta:
         input:
             unpack(get_local_data),
@@ -97,8 +97,8 @@ rule filter:
     output:
         sequences = "results/filtered.fasta"
     params:
-        group_by = "country year month",
-        sequences_per_group = 100,
+        group_by = "country",
+        sequences_per_group = 10,
         min_date = 2012
     shell:
         """
@@ -111,6 +111,7 @@ rule filter:
             --sequences-per-group {params.sequences_per_group} \
             --min-date {params.min_date}
         """
+
 
 rule align:
     message:
@@ -131,9 +132,9 @@ rule align:
             --reference-sequence {input.reference} \
             --output {output.alignment} \
             --nthreads {threads} \
-            --remove-reference \
             --fill-gaps
         """
+
 
 rule tree:
     message: "Building tree"
@@ -149,6 +150,7 @@ rule tree:
             --output {output.tree} \
             --nthreads {threads}
         """
+
 
 rule refine:
     message:
@@ -194,6 +196,7 @@ rule refine:
             --clock-filter-iqd {params.clock_filter_iqd}
         """
 
+
 rule ancestral:
     message: "Reconstructing ancestral sequences and mutations"
     input:
@@ -214,29 +217,12 @@ rule ancestral:
         """
 
 
-rule haplotype_status:
-    message: "Annotating haplotype status relative to {params.reference_node_name}"
-    input:
-        nt_muts = rules.ancestral.output.node_data
-    output:
-        node_data = "results/haplotype_status.json"
-    params:
-        reference_node_name = "USA/WA1/2020"
-    shell:
-        """
-        python3 scripts/annotate-haplotype-status.py \
-            --ancestral-sequences {input.nt_muts} \
-            --reference-node-name {params.reference_node_name:q} \
-            --output {output.node_data}
-        """
-
-
 rule translate:
     message: "Translating amino acid sequences"
     input:
         tree = rules.refine.output.tree,
         node_data = rules.ancestral.output.node_data,
-        reference = reference
+        reference = reference_gb
     output:
         node_data = "results/aa_muts.json"
     shell:
@@ -247,6 +233,7 @@ rule translate:
             --reference-sequence {input.reference} \
             --output-node-data {output.node_data} \
         """
+
 
 rule traits:
     message: "Inferring ancestral traits for {params.columns!s}"
