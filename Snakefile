@@ -2,6 +2,8 @@ import os
 from snakemake.logging import logger
 import sys
 from packaging import version
+from snakemake.remote.S3 import RemoteProvider as S3RemoteProvider
+S3 = S3RemoteProvider(access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"), secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"))
 
 MIN_AUGUR_VERSION = "7.0.2"
 
@@ -21,14 +23,15 @@ rule all:
 
 
 dropped_strains = "config/dropped_strains.txt",
-reference = "config/sarscov2_outgroup.fa",
-reference_gb = "config/sarscov2_outgroup.gb",
+reference = "config/sarscov2_outgroup.gb",
 auspice_config = "config/auspice_config.json"
-local_data = True
+
 
 def get_local_data(wildcards):
-    return {"local_fasta": "data/consensus_ano.fa", "local_metadata": "data/metadata_ano.tsv"}
+    return {"local_fasta": "data/our_sequences.fasta", "local_metadata": "data/our_metadata.tsv"}
 
+
+# Fetch SARS-CoV2 data from NCBI
 rule getdata:
     output:
         "data/sequences.gb"
@@ -38,43 +41,57 @@ rule getdata:
     script:
         "scripts/get_data.py"
 
+
+# Parse downloaded genbank sequences
 rule parsegb:
     input:
         "data/sequences.gb"
     output:
-        fasta = "data/sequences.fasta",
-        metadata = "data/metadata.tsv"
+        fasta = "data/global_sequences.fasta",
+        metadata = "data/global_metadata.tsv"
     script:
         "scripts/parse_gb.py"
 
-if local_data:
-    rule merge_metadata:
-        input:
-            unpack(get_local_data),
-            metadata = rules.parsegb.output.metadata
-        output:
-            metadata = "data/metadata_merged.tsv"
-        run:
-            import pandas as pd
-            md = pd.read_csv(input.metadata, sep = "\t")
-            lmd = pd.read_csv(input.local_metadata, sep = "\t")
-            concatenated = pd.concat([md, lmd])
-            concatenated.to_csv(output.metadata, sep = "\t")
+
+# Parse reference genbank to fasta 
+rule reference:
+    input:
+        reference
+    output:
+        fasta = "data/sarscov2_outgroup.fasta"
+    script:
+        "scripts/parse_gb.py"
 
 
-    rule merge_fasta:
-        input:
-            unpack(get_local_data),
-            fasta = rules.parsegb.output.fasta
-        output:
-            fasta = "data/sequences_merged.fasta"
-        shell:
-            "cat {input.fasta} {input.local_fasta} > {output}"
+# Merge local data to global data 
+rule merge_metadata:
+    input:
+        our_metadata = S3.remote("sc2-consensus-seqs/our_metadata.tsv"),
+        metadata = rules.parsegb.output.metadata
+    output:
+        metadata = "data/metadata.tsv"
+    run:
+        import pandas as pd
+        md = pd.read_csv(input.metadata, sep = "\t")
+        lmd = pd.read_csv(input.our_metadata, sep = "\t")
+        concatenated = pd.concat([md, lmd])
+        concatenated.to_csv(output.metadata, sep = "\t")
 
 
+rule merge_fasta:
+    input:
+        our_fasta = S3.remote("sc2-consensus-seqs/our_sequences.fasta"),
+        fasta = rules.parsegb.output.fasta
+    output:
+        fasta = "data/sequences.fasta"
+    shell:
+        "cat {input.fasta} {input.our_fasta} > {output}"
+
+
+# Fetch colors for country metadata
 rule colors:
     input:
-        rules.merge_metadata.output.metadata if local_data else rules.parsegb.output.metadata
+        "data/metadata.tsv"
     output:
         col = "config/colors.tsv",
         loc = "config/lat_longs.tsv"
@@ -82,6 +99,7 @@ rule colors:
         "scripts/country_colors.py" 
 
 
+# Main nextstrain workflow
 rule filter:
     message:
         """
@@ -91,8 +109,8 @@ rule filter:
           - excluding strains in {input.exclude}
         """
     input:
-        sequences = rules.merge_fasta.output.fasta if local_data else rules.parsegb.output.fasta,
-        metadata = rules.merge_metadata.output.metadata if local_data else rules.parsegb.output.metadata,
+        sequences = "data/sequences.fasta",
+        metadata = "data/metadata.tsv",
         exclude = dropped_strains
     output:
         sequences = "results/filtered.fasta"
@@ -121,7 +139,7 @@ rule align:
         """
     input:
         sequences = rules.filter.output.sequences,
-        reference = reference
+        reference = rules.reference.output.fasta
     output:
         alignment = "results/aligned.fasta"
     threads: 4
@@ -164,7 +182,7 @@ rule refine:
     input:
         tree = rules.tree.output.tree,
         alignment = rules.align.output,
-        metadata = rules.merge_metadata.output.metadata if local_data else rules.parsegb.output.metadata
+        metadata = "data/metadata.tsv"
     output:
         tree = "results/tree.nwk",
         node_data = "results/branch_lengths.json"
@@ -222,7 +240,7 @@ rule translate:
     input:
         tree = rules.refine.output.tree,
         node_data = rules.ancestral.output.node_data,
-        reference = reference_gb
+        reference = reference
     output:
         node_data = "results/aa_muts.json"
     shell:
@@ -239,7 +257,7 @@ rule traits:
     message: "Inferring ancestral traits for {params.columns!s}"
     input:
         tree = rules.refine.output.tree,
-        metadata = rules.merge_metadata.output.metadata if local_data else rules.parsegb.output.metadata
+        metadata = "data/metadata.tsv"
     output:
         node_data = "results/traits.json",
     params:
@@ -276,7 +294,7 @@ rule clades:
 rule recency:
     message: "Use metadata on submission date to construct submission recency field"
     input:
-        metadata = rules.merge_metadata.output.metadata if local_data else rules.parsegb.output.metadata
+        metadata = "data/metadata.tsv"
     output:
         "results/recency.json"
     shell:
@@ -291,7 +309,7 @@ rule export:
     message: "Exporting data files for auspice"
     input:
         tree = rules.refine.output.tree,
-        metadata = rules.merge_metadata.output.metadata if local_data else rules.parsegb.output.metadata,
+        metadata = "data/metadata.tsv",
         branch_lengths = rules.refine.output.node_data,
         traits = rules.traits.output.node_data,
         nt_muts = rules.ancestral.output.node_data,
