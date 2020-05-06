@@ -25,10 +25,7 @@ rule all:
 dropped_strains = "config/dropped_strains.txt",
 reference = "config/sarscov2_outgroup.gb",
 auspice_config = "config/auspice_config.json"
-
-
-def get_local_data(wildcards):
-    return {"local_fasta": "data/our_sequences.fasta", "local_metadata": "data/our_metadata.tsv"}
+min_length = 25000
 
 
 # Fetch SARS-CoV2 data from NCBI
@@ -43,12 +40,15 @@ rule getdata:
 
 
 # Parse downloaded genbank sequences
+# Filter by min length
 rule parsegb:
     input:
         "data/sequences.gb"
     output:
         fasta = "data/global_sequences.fasta",
         metadata = "data/global_metadata.tsv"
+    params:
+        min_length = min_length
     script:
         "scripts/parse_gb.py"
 
@@ -74,7 +74,7 @@ rule merge_metadata:
         import pandas as pd
         md = pd.read_csv(input.metadata, sep = "\t")
         lmd = pd.read_csv(input.our_metadata, sep = "\t")
-        concatenated = pd.concat([md, lmd])
+        concatenated = pd.concat([md, lmd], sort=False)
         concatenated.to_csv(output.metadata, sep = "\t")
 
 
@@ -117,7 +117,8 @@ rule filter:
     params:
         group_by = "country",
         sequences_per_group = 10,
-        min_date = 2012
+        min_date = 2018,
+        min_length = min_length
     shell:
         """
         augur filter \
@@ -127,7 +128,8 @@ rule filter:
             --output {output.sequences} \
             --group-by {params.group_by} \
             --sequences-per-group {params.sequences_per_group} \
-            --min-date {params.min_date}
+            --min-date {params.min_date} \
+            --min-length {params.min_length}
         """
 
 
@@ -154,10 +156,40 @@ rule align:
         """
 
 
+rule mask:
+    message:
+        """
+        Mask bases in alignment
+          - masking {params.mask_from_beginning} from beginning
+          - masking {params.mask_from_end} from end
+          - masking other sites: {params.mask_sites}
+        """
+    input:
+        alignment = rules.align.output.alignment
+    output:
+        alignment = "results/masked.fasta"
+    log:
+        "results/mask.log"
+    params:
+        mask_from_beginning = 130,
+        mask_from_end = 50,
+        mask_sites = "18529"
+    shell:
+        """
+        python3 scripts/mask-alignment.py \
+            --alignment {input.alignment} \
+            --mask-from-beginning {params.mask_from_beginning} \
+            --mask-from-end {params.mask_from_end} \
+            --mask-sites {params.mask_sites} \
+            --output {output.alignment} 2>&1 | tee {log}
+        """
+
+
+
 rule tree:
     message: "Building tree"
     input:
-        alignment = rules.align.output.alignment
+        alignment = rules.mask.output.alignment
     output:
         tree = "results/tree_raw.nwk"
     threads: 4
@@ -169,7 +201,7 @@ rule tree:
             --nthreads {threads}
         """
 
-
+# Clock rate and sd: https://www.sciencedirect.com/science/article/pii/S1567134820301829?via%3Dihub
 rule refine:
     message:
         """
@@ -181,15 +213,15 @@ rule refine:
         """
     input:
         tree = rules.tree.output.tree,
-        alignment = rules.align.output,
+        alignment = rules.mask.output.alignment,
         metadata = "data/metadata.tsv"
     output:
         tree = "results/tree.nwk",
         node_data = "results/branch_lengths.json"
     params:
         root = "SARS-CoV-2/human/CHN/Wuhan_IME-WH01/2019",
-        clock_rate = 0.0008,
-        clock_std_dev = 0.0004,
+        clock_rate = 0.0006,
+        clock_std_dev = 0.00008,
         coalescent = "skyline",
         date_inference = "marginal",
         divergence_unit = "mutations",
@@ -219,7 +251,7 @@ rule ancestral:
     message: "Reconstructing ancestral sequences and mutations"
     input:
         tree = rules.refine.output.tree,
-        alignment = rules.align.output
+        alignment = rules.mask.output.alignment
     output:
         node_data = "results/nt_muts.json"
     params:

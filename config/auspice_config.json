@@ -3,7 +3,7 @@
   "maintainers": [
     {"name": "Taavi Päll", "url": "https://www.biomeditsiin.ut.ee/en/institute/department-microbiology"}
   ],
-  "build_url": "https://github.com/avilab/sars-cov2-est",
+  "build_url": "https://github.com/avilab/sarscov2-epidemiology",
   "colorings": [
     {
       "key": "gt",
@@ -39,7 +39,7 @@
     "distance_measure": "num_date",
     "geo_resolution": "country",
     "map_triplicate": true,
-    "branch_label": "none"
+    "branch_label": "aa"
   },
   "filters": [
     "country",

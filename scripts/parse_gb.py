@@ -17,13 +17,13 @@ def fix_date(x):
 
 sars = "Severe acute respiratory syndrome coronavirus 2 (isolate )?"
 gen = ", complete genome"
-
+min_length = snakemake.params.get("min_length", 25000)
 
 ord_list = []
 strain = []
 with open(snakemake.output.fasta, "w") as fasta_handle:
     for seq_record in SeqIO.parse(snakemake.input[0], "genbank"):
-        if len(seq_record.seq) > 28000:
+        if len(seq_record.seq) > min_length:
             q = seq_record.features[0]
             refs = seq_record.annotations["references"][0]
             ids = {
