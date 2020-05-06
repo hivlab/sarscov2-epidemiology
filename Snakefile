@@ -116,7 +116,7 @@ rule filter:
         sequences = "results/filtered.fasta"
     params:
         group_by = "country",
-        sequences_per_group = 10,
+        sequences_per_group = 100,
         min_date = 2018,
         min_length = min_length
     shell:
