@@ -24,8 +24,7 @@
     "node": "13.x"
   },
   "dependencies": {
-    "auspice": "^2.11.3",
-    "elliptic": ">=6.5.3"
+    "auspice": "^2.11.3"
   },
   "devDependencies": {}
 }
