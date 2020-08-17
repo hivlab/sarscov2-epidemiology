@@ -22,7 +22,7 @@ rule all:
         auspice_json = "auspice/sarscov2.json"
 
 
-dropped_strains = "config/dropped_strains.txt",
+include_strains = "config/include_strains.txt",
 reference = "config/sarscov2_outgroup.gb",
 auspice_config = "config/auspice_config.json"
 min_length = 25000
@@ -111,7 +111,7 @@ rule filter:
     input:
         sequences = "data/sequences.fasta",
         metadata = "data/metadata.tsv",
-        exclude = dropped_strains
+        include = include_strains
     output:
         sequences = "results/filtered.fasta"
     params:
@@ -124,7 +124,7 @@ rule filter:
         augur filter \
             --sequences {input.sequences} \
             --metadata {input.metadata} \
-            --exclude {input.exclude} \
+            --include {input.include} \
             --output {output.sequences} \
             --group-by {params.group_by} \
             --sequences-per-group {params.sequences_per_group} \
@@ -171,9 +171,9 @@ rule mask:
     log:
         "results/mask.log"
     params:
-        mask_from_beginning = 130,
+        mask_from_beginning = 100,
         mask_from_end = 50,
-        mask_sites = "18529"
+        mask_sites = "13402 18529 24389 24390"
     shell:
         """
         python3 scripts/mask-alignment.py \
@@ -219,7 +219,7 @@ rule refine:
         tree = "results/tree.nwk",
         node_data = "results/branch_lengths.json"
     params:
-        root = "min_dev", 
+        root = "SARS-CoV-2/human/CHN/Wuhan_IME-WH01/2019", 
         clock_rate = 0.0006,
         clock_std_dev = 0.00008,
         coalescent = "skyline",
