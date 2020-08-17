@@ -219,7 +219,7 @@ rule refine:
         tree = "results/tree.nwk",
         node_data = "results/branch_lengths.json"
     params:
-        root = "SARS-CoV-2/human/CHN/Wuhan_IME-WH01/2019",
+        root = "min_dev", 
         clock_rate = 0.0006,
         clock_std_dev = 0.00008,
         coalescent = "skyline",
