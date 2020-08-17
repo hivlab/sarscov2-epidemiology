@@ -106,7 +106,6 @@ rule filter:
         Filtering to
           - {params.sequences_per_group} sequence(s) per {params.group_by!s}
           - from {params.min_date} onwards
-          - excluding strains in {input.exclude}
         """
     input:
         sequences = "data/sequences.fasta",
