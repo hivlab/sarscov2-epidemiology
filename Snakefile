@@ -218,7 +218,7 @@ rule refine:
         tree = "results/tree.nwk",
         node_data = "results/branch_lengths.json"
     params:
-        root = "Wuhan-Hu-1", 
+        root = "best", 
         clock_rate = 0.0006,
         clock_std_dev = 0.00008,
         coalescent = "skyline",
