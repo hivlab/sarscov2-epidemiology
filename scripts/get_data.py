@@ -17,7 +17,7 @@ record = Entrez.read(handle)
 handle.close()
 acc = record["IdList"]
 with open(snakemake.output[0], "w+") as h:
-    for b in batch(acc, 20):
+    for b in batch(acc, 40):
         handle = Entrez.efetch(
             db="nucleotide", id=",".join(b), rettype="gb", retmode="text"
         )
