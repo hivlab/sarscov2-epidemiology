@@ -3,6 +3,7 @@ from collections import OrderedDict, Counter
 import pandas as pd
 from datetime import datetime
 import re
+import numpy as np
 
 
 def fix_date(x):
@@ -57,15 +58,20 @@ with open(snakemake.output.fasta, "w") as fasta_handle:
 
 
 if "metadata" in snakemake.output.keys():
-    
+
     # Parsing metadata
-    df = pd.DataFrame(ord_list, columns=ord_list[0].keys()).set_index("strain", drop=False)
+    df = pd.DataFrame(ord_list, columns=ord_list[0].keys()).set_index(
+        "strain", drop=False
+    )
     df_renamed = df.rename(columns={"organism": "virus", "collection_date": "date"})
     df_renamed["date"] = df_renamed["date"].apply(lambda x: fix_date(x))
     new = df_renamed["country"].str.split(": ?", expand=True)
     df_renamed["division"] = new[1]
     df_renamed["country"] = new[0]
 
+    # Replace missing values in author col with 'unknown'
+    df_renamed.replace("", np.nan, inplace=True)
+    df_renamed["author"] = df_renamed.author.fillna("unknown")
 
     # Writing metadata to file
     df_renamed.to_csv(snakemake.output.metadata, sep="\t", index=False)

@@ -53,15 +53,6 @@ rule parsegb:
         "scripts/parse_gb.py"
 
 
-# Parse reference genbank to fasta 
-rule reference:
-    input:
-        reference
-    output:
-        fasta = "data/sarscov2_outgroup.fasta"
-    script:
-        "scripts/parse_gb.py"
-
 
 # Merge local data to global data 
 rule merge_metadata:
@@ -135,12 +126,12 @@ rule filter:
 rule align:
     message:
         """
-        Aligning sequences to {input.reference}
+        Aligning sequences
           - filling gaps with N
         """
     input:
         sequences = rules.filter.output.sequences,
-        reference = rules.reference.output.fasta
+        
     output:
         alignment = "results/aligned.fasta"
     threads: 4
@@ -148,7 +139,6 @@ rule align:
         """
         augur align \
             --sequences {input.sequences} \
-            --reference-sequence {input.reference} \
             --output {output.alignment} \
             --nthreads {threads} \
             --fill-gaps
@@ -218,7 +208,7 @@ rule refine:
         tree = "results/tree.nwk",
         node_data = "results/branch_lengths.json"
     params:
-        root = "best", 
+        root = "SARS-CoV-2/human/CHN/Wuhan_IME-WH01/2019", 
         clock_rate = 0.0006,
         clock_std_dev = 0.00008,
         coalescent = "skyline",
