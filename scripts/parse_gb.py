@@ -33,6 +33,11 @@ with open(snakemake.output.fasta, "w") as fasta_handle:
                 "length": len(seq_record.seq),
             }
             qualifiers = {k: v[0] for k, v in q.qualifiers.items()}
+            # Skip record if collection_date or country is missing
+            if "country" not in qualifiers:
+                continue
+            if "collection_date" not in qualifiers:
+                continue
             if "strain" not in qualifiers:
                 qualifiers.update({"strain": None})
             if not qualifiers["strain"]:
