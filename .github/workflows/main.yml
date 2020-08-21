@@ -4,8 +4,10 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    types: [assigned, opened, synchronize, reopened]
   schedule:
-    - cron:  "15 9,21 * * *"
+    - cron:  "15 21 * * *"
 
 jobs:
   data:
