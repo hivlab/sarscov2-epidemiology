@@ -27,6 +27,5 @@
     "auspice": "^2.11.3"
   },
   "devDependencies": {
-    "serialize-javascript": ">=3.1.0" 
   }
 }
