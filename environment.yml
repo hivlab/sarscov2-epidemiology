@@ -23,6 +23,7 @@ dependencies:
   - biopython
   - geopy
   - xlrd
+  - pulp
   - pip:
     - nextstrain-augur>=7.0.2
     - nextstrain-cli
