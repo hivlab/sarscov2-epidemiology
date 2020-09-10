@@ -34,7 +34,9 @@ rule getdata:
         "data/sequences.gb"
     params:
         email = "taavi.pall@ut.ee",
-        api_key = os.environ.get("NCBI_APIKEY")
+        api_key = os.environ.get("NCBI_APIKEY"),
+        retmax = 20000,
+        batches = 100
     script:
         "scripts/get_data.py"
 

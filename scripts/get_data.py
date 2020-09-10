@@ -12,12 +12,12 @@ term = '("Severe acute respiratory syndrome coronavirus 2"[Organism] OR ("Severe
 Entrez.email = snakemake.params["email"]
 Entrez.api_key = snakemake.params["api_key"]
 Entrez.max_tries = 6
-handle = Entrez.esearch(db="nucleotide", retmax=20000, term=term, idtype="acc")
+handle = Entrez.esearch(db="nucleotide", retmax=snakemake.params["retmax"], term=term, idtype="acc")
 record = Entrez.read(handle)
 handle.close()
 acc = record["IdList"]
 with open(snakemake.output[0], "w+") as h:
-    for b in batch(acc, 40):
+    for b in batch(acc, snakemake.params["batches"]):
         handle = Entrez.efetch(
             db="nucleotide", id=",".join(b), rettype="gb", retmode="text"
         )
