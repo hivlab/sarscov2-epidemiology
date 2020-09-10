@@ -1,5 +1,6 @@
 from Bio import Entrez
 import os
+from http.client import IncompleteRead
 
 
 def batch(iterable, n=1):
@@ -21,5 +22,9 @@ with open(snakemake.output[0], "w+") as h:
         handle = Entrez.efetch(
             db="nucleotide", id=",".join(b), rettype="gb", retmode="text"
         )
-        h.writelines(handle)
+        try:
+            h.writelines(handle)
+        except IncompleteRead as e:
+            print(e)
+            continue
         handle.close()
