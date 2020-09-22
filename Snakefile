@@ -226,6 +226,7 @@ rule refine:
             --output-tree {output.tree} \
             --output-node-data {output.node_data} \
             --root {params.root} \
+            --keep-root \
             --timetree \
             --clock-rate {params.clock_rate} \
             --clock-std-dev {params.clock_std_dev} \
