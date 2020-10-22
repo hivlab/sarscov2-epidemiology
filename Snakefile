@@ -30,6 +30,12 @@ min_length = 25000
 
 # Fetch SARS-CoV2 data from NCBI
 rule getdata:
+    message:
+        """
+        Getting sequences from NCBI Genebank
+          - Maximum number of sequences to retrieve is {params.retmax}
+          - Downloading seqs in {params.batches} batches
+        """
     output:
         "data/sequences.gb"
     params:
@@ -44,6 +50,11 @@ rule getdata:
 # Parse downloaded genbank sequences
 # Filter by min length
 rule parsegb:
+    message:
+        """
+        Parsing sequences
+          - Keeping only seqs with minimum length {params.min_length} nucleotides
+        """
     input:
         "data/sequences.gb"
     output:
@@ -164,7 +175,6 @@ rule mask:
     params:
         mask_from_beginning = 100,
         mask_from_end = 50,
-        mask_sites = "13402 18529 24389 24390"
     shell:
         """
         python3 scripts/mask-alignment.py \
