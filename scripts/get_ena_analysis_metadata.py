@@ -62,7 +62,7 @@ def main(accessions, output, size=200):
         r.raise_for_status
         metadata.update(parse_analysis_xml(r.content))
 
-    pd.DataFrame.from_dict(metadata, orient="index").to_csv(
+    return pd.DataFrame.from_dict(metadata, orient="index").to_csv(
         output, index_label="PRIMARY_ID"
     )
 
