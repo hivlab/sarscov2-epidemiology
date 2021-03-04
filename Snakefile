@@ -181,7 +181,6 @@ rule mask:
             --alignment {input.alignment} \
             --mask-from-beginning {params.mask_from_beginning} \
             --mask-from-end {params.mask_from_end} \
-            --mask-sites {params.mask_sites} \
             --output {output.alignment} 2>&1 | tee {log}
         """
 
