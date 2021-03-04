@@ -164,7 +164,6 @@ rule mask:
         Mask bases in alignment
           - masking {params.mask_from_beginning} from beginning
           - masking {params.mask_from_end} from end
-          - masking other sites: {params.mask_sites}
         """
     input:
         alignment = rules.align.output.alignment
