@@ -3,6 +3,7 @@ import requests
 import xml.etree.ElementTree as ET
 import itertools
 import argparse
+import numpy as np
 
 
 def chunked_iterable(iterable, size):
@@ -24,7 +25,11 @@ def parse_sample_xml(xml_string):
             sample_attrib = s.findall("SAMPLE_ATTRIBUTES/SAMPLE_ATTRIBUTE")
             tags = {}
             for e in sample_attrib:
-                tags.update({e.find("TAG").text: e.find("VALUE").text})
+                try:
+                    tags.update({e.find("TAG").text: e.find("VALUE").text})
+                except AttributeError as err:
+                    print(f"{PRIMARY_ID}: {err}")
+                    tags.update({e.find("TAG").text: np.nan})
             sample.update({PRIMARY_ID: tags})
     return sample
 
