@@ -24,7 +24,7 @@
     "node": "13.x"
   },
   "dependencies": {
-    "auspice": "^2.11.3"
+    "auspice": "^2.43.0"
   },
   "devDependencies": {
   }
